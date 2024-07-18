@@ -1,0 +1,1 @@
+{"model": "gpt-4o", "top_k": 1, "chunk_size": 1500, "chunk_overlap": 50, "min_content_length": 100, "max_depth": 1}

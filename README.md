@@ -15,7 +15,7 @@
 ## Introduction
 
 Deep Crawl RAG System is an advanced web scraping and question-answering tool that leverages the power of Retrieval-Augmented Generation (RAG) to provide intelligent responses based on scraped web content. This system allows users to input multiple URLs, scrape their content in parallel, and then use this information to answer user queries.
-![image](https://github.com/user-attachments/assets/5e367344-775b-43ed-9953-d87ecd1aed91)
+![image](https://github.com/user-attachments/assets/0ef37821-8749-4358-8190-01be150b038c)
 
 ## Features
 

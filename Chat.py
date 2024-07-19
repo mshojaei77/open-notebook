@@ -89,10 +89,9 @@ def main():
 
     # Sidebar for configuration
     st.sidebar.header("Configuration")
-    load_dotenv()
-    local_api_key = os.getenv('OPENAI_API_KEY')
-    if local_api_key:
-        st.session_state.api_key = local_api_key
+
+    if st.session_state.api_key:
+        st.session_state.api_key = st.session_state.api_key
     else:
         st.session_state.api_key = st.sidebar.text_input(
             "OpenAI API Key", type="password")

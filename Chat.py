@@ -8,10 +8,6 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from openai import OpenAI
 from crawler import scrape_urls_parallel
-from dotenv import load_dotenv
-
-# scrape_urls_parallel(urls, max_depth, min_content_length)
-
 
 def setup_rag(chunk_size, chunk_overlap, files):
     if 'api_key' not in st.session_state or not st.session_state.api_key:
@@ -90,11 +86,8 @@ def main():
     # Sidebar for configuration
     st.sidebar.header("Configuration")
 
-    if st.session_state.api_key:
-        st.session_state.api_key = st.session_state.api_key
-    else:
-        st.session_state.api_key = st.sidebar.text_input(
-            "OpenAI API Key", type="password")
+    if 'api_key' not in st.session_state:
+        st.session_state.api_key = st.sidebar.text_input("OpenAI API Key")
         if st.sidebar.button("Save OpenAI API Key"):
             open('.env', 'a').write(
                 f'OPENAI_API_KEY={st.session_state.api_key}')

@@ -85,13 +85,7 @@ def main():
 
     # Sidebar for configuration
     st.sidebar.header("Configuration")
-
-    if 'api_key' not in st.session_state:
-        st.session_state.api_key = st.sidebar.text_input("OpenAI API Key")
-        if st.sidebar.button("Save OpenAI API Key"):
-            open('.env', 'a').write(
-                f'OPENAI_API_KEY={st.session_state.api_key}')
-
+    st.session_state.api_key = st.sidebar.text_input("OpenAI API Key")
     urls = st.sidebar.text_area("URLs to scrape (one per line)", height=100)
 
     # reading the settings

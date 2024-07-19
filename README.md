@@ -81,20 +81,13 @@ You can configure the application through the `settings.json` file:
    - Retrieves context from the knowledge base for each user query.
    - Uses OpenAI's language models to generate responses based on the provided context and user query.
 
-## Files
-
-- `main.py`: The main application script.
-- `settings.json`: Configuration file for model and other parameters.
-- `system_prompt.txt`: The system prompt used by OpenAI's language model.
-- `.env`: File to store environment variables, including the OpenAI API key.
-
 ## Contributing
 
 Feel free to fork this repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 

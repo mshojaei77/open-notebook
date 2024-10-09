@@ -14,7 +14,9 @@ Open Notebook is an AI-powered knowledge management and question-answering syste
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/open-notebook.git
+   https://github.com/mshojaei77/open-notebook.git
+   ```
+   ```
    cd open-notebook
    ```
 

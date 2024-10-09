@@ -7,3 +7,4 @@ python-dotenv
 faiss-cpu
 PyPDF2
 scrapy
+beautifulsoup4

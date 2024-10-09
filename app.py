@@ -226,10 +226,17 @@ with st.sidebar:
         else:
             st.session_state.api_key = st.text_input(
                 "OpenAI API Key", type="password", help="Enter your OpenAI API key here. You can get one from https://platform.openai.com/account/api-keys")
-            if st.button("Save OpenAI API Key"):
+        
+        # Add option to change API key
+        new_api_key = st.text_input("New OpenAI API Key", type="password", help="Enter a new OpenAI API key if you want to change it")
+        if st.button("Update API Key"):
+            if new_api_key:
+                st.session_state.api_key = new_api_key
                 with open('.env', 'w') as env_file:
-                    env_file.write(f'OPENAI_API_KEY={st.session_state.api_key}')
-                st.success("API Key saved successfully!")
+                    env_file.write(f'OPENAI_API_KEY={new_api_key}')
+                st.success("API Key updated successfully!")
+            else:
+                st.warning("Please enter a new API key to update")
 
     # Settings
     with st.expander("Advanced Settings", expanded=False):

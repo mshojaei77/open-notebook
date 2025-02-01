@@ -22,6 +22,10 @@ FAISS_DIR = KBASE_DIR / "faiss"
 JSON_DIR.mkdir(parents=True, exist_ok=True)
 FAISS_DIR.mkdir(parents=True, exist_ok=True)
 
+# Initialize session state for API key
+if "api_key" not in st.session_state:
+    st.session_state.api_key = ""
+
 def sanitize_filename(name):
     # Remove invalid characters for filenames
     return re.sub(r'[^a-zA-Z0-9-_\.]', '_', name)
@@ -89,21 +93,17 @@ def query_rag(query, vector_dbs, top_k):
         st.sidebar.error("RAG system is not properly set up. Please check your configuration and try again.")
         return None
 
-    merged_db = None
-    for file, vector_db in vector_dbs.items():
-        if merged_db is None:
-            merged_db = vector_db
-        else:
-            merged_db.merge_from(vector_db)
+    # Collect all documents and their scores across all vector DBs
+    all_results = []
+    for vector_db in vector_dbs.values():
+        results = vector_db.similarity_search_with_score(query, k=top_k)
+        all_results.extend(results)
 
-    if merged_db is None:
-        st.sidebar.error("Failed to merge vector databases.")
-        return None
-
-    results = merged_db.similarity_search_with_score(query, k=top_k)
-    results.sort(key=lambda x: x[1])
+    # Sort all results by score and take top_k
+    all_results.sort(key=lambda x: x[1])
+    top_results = all_results[:top_k]
     
-    contents = " ".join([doc.page_content for doc, score in results])
+    contents = " ".join([doc.page_content for doc, score in top_results])
 
     if len(contents) > 4000:
         contents = contents[:4000]
@@ -223,20 +223,21 @@ with st.sidebar:
         local_api_key = os.getenv('OPENAI_API_KEY')
         if local_api_key:
             st.session_state.api_key = local_api_key
+            st.success("API Key loaded from environment")
         else:
-            st.session_state.api_key = st.text_input(
-                "OpenAI API Key", type="password", help="Enter your OpenAI API key here. You can get one from https://platform.openai.com/account/api-keys")
-        
-        # Add option to change API key
-        new_api_key = st.text_input("New OpenAI API Key", type="password", help="Enter a new OpenAI API key if you want to change it")
-        if st.button("Update API Key"):
-            if new_api_key:
-                st.session_state.api_key = new_api_key
-                with open('.env', 'w') as env_file:
-                    env_file.write(f'OPENAI_API_KEY={new_api_key}')
-                st.success("API Key updated successfully!")
-            else:
-                st.warning("Please enter a new API key to update")
+            api_key_input = st.text_input(
+                "OpenAI API Key", 
+                type="password", 
+                value=st.session_state.api_key,
+                help="Enter your OpenAI API key here. You can get one from https://platform.openai.com/account/api-keys"
+            )
+            
+            if api_key_input:
+                st.session_state.api_key = api_key_input
+                if st.button("Save API Key"):
+                    with open('.env', 'w') as env_file:
+                        env_file.write(f'OPENAI_API_KEY={api_key_input}')
+                    st.success("API Key saved successfully!")
 
     # Settings
     with st.expander("Advanced Settings", expanded=False):
@@ -271,17 +272,22 @@ with st.sidebar:
 
                 with st.spinner("Updating knowledge base..."):
                     new_files = []
-                    for url, content in scraped_urls.items():
-                        # Use domain name as the base for the title
+                    for i, content in enumerate(scraped_urls):
+                        # Use index and URL as fallback title
+                        url = url_list[i] if i < len(url_list) else f"content_{i}"
                         domain = re.sub(r'^https?://', '', url).split('/')[0]
-                        title = content.get("title", domain)
+                        title = domain  # Using domain as title since we don't have title metadata
                         sanitized_title = sanitize_filename(title)
                         readable_title = generate_readable_filename(title)
                         unique_id = uuid.uuid4().hex[:6]
                         json_filename = f"{readable_title}_{unique_id}.json"
                         json_path = JSON_DIR / json_filename
                         with open(json_path, "w", encoding='utf-8') as jf:
-                            json.dump({"url": url, "title": title, "content": content.get("content", "")}, jf, ensure_ascii=False)
+                            json.dump({
+                                "url": url, 
+                                "title": title, 
+                                "content": content  # content is now directly the text string
+                            }, jf, ensure_ascii=False)
                         new_files.append(json_filename)
                     
                     files = [f.name for f in JSON_DIR.glob("*.json") if f.name != "settings.json"]
